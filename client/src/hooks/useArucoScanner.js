@@ -77,8 +77,17 @@ export function useArucoScanner(onDetected) {
 
     try {
       // Dynamically import js-aruco
-      const AR = await import('js-aruco2').then((m) => m.default || m);
-      detectorRef.current = new AR.AR.Detector();
+      // js-aruco2 is a legacy script that attaches itself to the global
+      // object (`this.AR = ...`) instead of using real module.exports.
+      // Under Node/dev this happened to also land on the CJS exports object,
+      // but Vite's production bundler resolves that `this` to `window` —
+      // so the library only ever actually shows up on window.AR.
+      await import('js-aruco2');
+      const AR = window.AR;
+      if (!AR || !AR.Detector) {
+        throw new Error('AR library did not attach to window as expected');
+      }
+      detectorRef.current = new AR.Detector();
     } catch (err) {
       console.error('[ArUco] Failed to init detector:', err);
       setError('Failed to load ArUco library. Please refresh and try again.');
