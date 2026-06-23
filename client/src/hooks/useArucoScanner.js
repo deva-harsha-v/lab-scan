@@ -80,6 +80,7 @@ export function useArucoScanner(onDetected) {
       const AR = await import('js-aruco2').then((m) => m.default || m);
       detectorRef.current = new AR.AR.Detector();
     } catch (err) {
+      console.error('[ArUco] Failed to init detector:', err);
       setError('Failed to load ArUco library. Please refresh and try again.');
       return;
     }
