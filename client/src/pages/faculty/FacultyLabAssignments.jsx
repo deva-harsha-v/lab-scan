@@ -201,18 +201,21 @@ function SlotEditor({ assignment, onClose, onSaved }) {
 
     if (existing) {
       let expId = null;
+      let humanDescription = existing.description || '';
       try {
         const parsed = existing.description ? JSON.parse(existing.description) : null;
         if (parsed && typeof parsed === 'object' && parsed.__experimentId) {
           expId = parsed.__experimentId;
+          // The slot description is stored as a JSON envelope — extract the human-readable summary
+          humanDescription = parsed.summary || '';
         }
       } catch {
-        // Fallback for flat strings
+        // Fallback for plain strings — humanDescription already set above
       }
 
       setForm({
         title: existing.title || '',
-        description: existing.description || '',
+        description: humanDescription,
         arucoId: '',
         department: '',
         maxMarks: existing.maxMarks || 10,

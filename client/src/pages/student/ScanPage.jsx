@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import Navbar from '../../components/Navbar';
 import ArucoScanner from '../../components/ArucoScanner';
 import { experimentsApi } from '../../api/experiments.api';
@@ -11,8 +11,11 @@ export default function ScanPage() {
   const [status, setStatus] = useState('idle'); // idle | detecting | found | error
   const [experiment, setExperiment] = useState(null);
   const [error, setError] = useState('');
+  const scanningRef = useRef(false);
 
-  const handleDetected = async (markerId) => {
+  const handleDetected = useCallback(async (markerId) => {
+    if (scanningRef.current) return;
+    scanningRef.current = true;
     setStatus('detecting');
     setError('');
     try {
@@ -28,8 +31,9 @@ export default function ScanPage() {
         setError('Failed to look up experiment. Please try again.');
       }
       setStatus('error');
+      scanningRef.current = false;
     }
-  };
+  }, []);
 
   const handleContinue = () => {
     if (experiment) {
@@ -38,6 +42,7 @@ export default function ScanPage() {
   };
 
   const handleReset = () => {
+    scanningRef.current = false;
     setStatus('idle');
     setExperiment(null);
     setError('');

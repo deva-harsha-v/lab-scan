@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import LabScanLogo from '../../components/LabScanLogo';
 import { useRouter } from '../../App';
 import { sessionsApi } from '../../api/sessions.api';
@@ -94,6 +94,7 @@ export default function JoinSession() {
   const [error, setError] = useState('');
   const [scanStatus, setScanStatus] = useState('idle');
   const [scannedExp, setScannedExp] = useState(null);
+  const scanningRef = useRef(false); // prevents duplicate/re-entrant detections
 
   const isDark = tokens.colorScheme === 'dark';
 
@@ -122,17 +123,29 @@ export default function JoinSession() {
     setStep(3);
   };
 
-  const handleDetected = async (markerId) => {
-    setScanStatus('detecting'); setError('');
+  const handleDetected = useCallback(async (markerId) => {
+    // Guard against re-entrant calls: the scanner's consecutive-frame logic can
+    // fire the callback multiple times if the RAF loop isn't fully torn down yet,
+    // or when the user resets and a stale frame sneaks through. A ref gives us a
+    // synchronous lock that doesn't depend on React state update timing.
+    if (scanningRef.current) return;
+    scanningRef.current = true;
+
+    setScanStatus('detecting');
+    setError('');
     try {
       const res = await experimentsApi.lookupByAruco(markerId);
       setScannedExp(res.data);
       setScanStatus('found');
+      // Leave scanningRef = true so no further scans overwrite this result.
+      // It gets cleared explicitly when the user hits the reset (↺) button.
     } catch (err) {
       setError(err.response?.status === 404 ? `No experiment for marker ${markerId}.` : 'Scan failed. Try again.');
       setScanStatus('error');
+      // Allow retry after an error
+      scanningRef.current = false;
     }
-  };
+  }, []);
 
   const handleContinue = () => {
     navigate('experiment-view', { session, experiment: scannedExp, members });
@@ -254,7 +267,7 @@ export default function JoinSession() {
                 )}
                 {error && <div style={{ marginTop:12, padding:'10px 14px', background:tokens.dangerBg, border:`1px solid ${tokens.dangerBorder}`, borderRadius:8, color:tokens.danger, fontSize:13 }}>{error}</div>}
 
-                <button type="button" onClick={() => { setStep(2); setError(''); setScanStatus('idle'); }} style={{ marginTop:16, width:'100%', padding:'10px', background:'transparent', border:'none', color:tokens.textDimmer, fontFamily:"'Space Mono',monospace", fontSize:11, cursor:'pointer', letterSpacing:'0.06em' }}>
+                <button type="button" onClick={() => { scanningRef.current = false; setStep(2); setError(''); setScanStatus('idle'); }} style={{ marginTop:16, width:'100%', padding:'10px', background:'transparent', border:'none', color:tokens.textDimmer, fontFamily:"'Space Mono',monospace", fontSize:11, cursor:'pointer', letterSpacing:'0.06em' }}>
                   ← Edit group details
                 </button>
               </>
@@ -270,7 +283,7 @@ export default function JoinSession() {
                 </div>
                 <div style={{ display:'grid', gridTemplateColumns:'1fr 44px', gap:10 }}>
                   <button onClick={handleContinue} style={{ ...S.btn, background:tokens.successGrad || 'linear-gradient(135deg,#4af0c4,#1e64ff)', color:tokens.textInverse, boxShadow:tokens.shadow }}>Start Experiment →</button>
-                  <button onClick={() => { setScanStatus('idle'); setScannedExp(null); setError(''); }} style={{ padding:'13px', background:tokens.btnSecondaryBg, border:`1px solid ${tokens.btnSecondaryBorder}`, borderRadius:10, color:tokens.btnSecondaryText, cursor:'pointer', fontSize:16, display:'flex', alignItems:'center', justifyContent:'center' }}>↺</button>
+                  <button onClick={() => { scanningRef.current = false; setScanStatus('idle'); setScannedExp(null); setError(''); }} style={{ padding:'13px', background:tokens.btnSecondaryBg, border:`1px solid ${tokens.btnSecondaryBorder}`, borderRadius:10, color:tokens.btnSecondaryText, cursor:'pointer', fontSize:16, display:'flex', alignItems:'center', justifyContent:'center' }}>↺</button>
                 </div>
               </div>
             )}
