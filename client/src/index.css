@@ -1,0 +1,246 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Global transition for smooth theme switching ── */
+*, *::before, *::after {
+  transition-property: background-color, background, border-color, color, box-shadow;
+  transition-duration: 280ms;
+  transition-timing-function: ease;
+}
+/* Exclude transitions that would look bad globally */
+*:where(svg, path, img, canvas, video) {
+  transition: none;
+}
+
+@layer base {
+  html {
+    overflow-x: hidden;
+    color-scheme: dark;
+  }
+  html.light {
+    color-scheme: light;
+  }
+
+  body {
+    @apply font-sans antialiased;
+    background: var(--bg-page, #050c14);
+    color: var(--text-primary, #e2f4ff);
+    overflow-x: hidden;
+  }
+
+  /* Date/time inputs in light mode */
+  html.light input[type="datetime-local"],
+  html.light input[type="date"],
+  html.light input[type="time"] {
+    color-scheme: light;
+  }
+
+  img, video, iframe, embed, object {
+    max-width: 100%;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply font-medium px-4 py-2 rounded-lg transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+  }
+  .btn-primary:hover:not(:disabled) {
+    background: var(--btn-primary-bg-hover);
+  }
+
+  .btn-secondary {
+    @apply font-medium px-4 py-2 rounded-lg transition-all duration-200 active:scale-95;
+    background: var(--btn-secondary-bg);
+    color: var(--btn-secondary-text);
+    border: 1px solid var(--btn-secondary-border);
+  }
+  .btn-secondary:hover {
+    background: var(--btn-secondary-bg-hover);
+  }
+
+  .btn-danger {
+    @apply font-medium px-4 py-2 rounded-lg transition-all duration-200 active:scale-95;
+    background: var(--btn-danger-bg);
+    color: var(--btn-danger-text);
+    border: 1px solid var(--btn-danger-border);
+  }
+  .btn-danger:hover {
+    background: var(--btn-danger-bg-hover);
+  }
+
+  .input {
+    @apply rounded-lg px-3 py-2 w-full;
+    background: var(--bg-input);
+    border: 1px solid var(--border-input);
+    color: var(--text-primary);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-muted);
+  }
+  .input::placeholder {
+    color: var(--text-dimmer);
+  }
+
+  .card {
+    @apply rounded-xl p-5;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-card);
+  }
+
+  /* Theme-aware badge variants */
+  .badge-active {
+    background: var(--success-bg);
+    color: var(--success);
+    border: 1px solid var(--success-border);
+    @apply text-xs px-2 py-0.5 rounded-full font-medium;
+  }
+  .badge-grace {
+    background: var(--warning-bg);
+    color: var(--warning);
+    border: 1px solid var(--warning-border);
+    @apply text-xs px-2 py-0.5 rounded-full font-medium;
+  }
+  .badge-draft {
+    background: var(--bg-surface);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    @apply text-xs px-2 py-0.5 rounded-full font-medium;
+  }
+  .badge-closed {
+    background: var(--danger-bg);
+    color: var(--danger);
+    border: 1px solid var(--danger-border);
+    @apply text-xs px-2 py-0.5 rounded-full font-medium;
+  }
+}
+
+/* ── Responsive utilities ── */
+@layer utilities {
+  .dashboard-layout {
+    display: flex;
+    position: relative;
+    min-height: calc(100vh - 64px);
+  }
+
+  @media (max-width: 767px) {
+    .dashboard-sidebar {
+      position: fixed !important;
+      top: 0 !important;
+      left: -280px !important;
+      width: 280px !important;
+      height: 100vh !important;
+      z-index: 100 !important;
+      transition: left 0.3s ease !important;
+    }
+    .dashboard-sidebar.open {
+      left: 0 !important;
+    }
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 99;
+    }
+    .sidebar-overlay.open {
+      display: block;
+    }
+    .dashboard-content {
+      width: 100% !important;
+      min-width: 0 !important;
+      padding: 16px !important;
+    }
+  }
+
+  .responsive-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  @media (min-width: 640px) {
+    .responsive-grid-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .dashboard-nav {
+    padding: 0 16px !important;
+  }
+  @media (min-width: 640px) {
+    .dashboard-nav {
+      padding: 0 24px !important;
+    }
+  }
+  @media (min-width: 1024px) {
+    .dashboard-nav {
+      padding: 0 40px !important;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .nav-label-hide {
+      display: none !important;
+    }
+  }
+}
+
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 480px) {
+  .hod-nav-username {
+    display: none !important;
+  }
+}
+
+/* Particle canvas — hidden in light mode to keep it clean */
+html.light .particle-canvas {
+  opacity: 0.12;
+}
+
+/* Scrollbar theming */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong, rgba(255,255,255,0.12));
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-dimmer, rgba(200,220,235,0.25));
+}
+
+/* Keyframe animations */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes slideUp {
+  0% { opacity: 0; transform: translateY(16px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
