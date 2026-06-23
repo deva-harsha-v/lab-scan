@@ -124,28 +124,50 @@ export default function JoinSession() {
   };
 
   const handleDetected = useCallback(async (markerId) => {
-    // Guard against re-entrant calls: the scanner's consecutive-frame logic can
-    // fire the callback multiple times if the RAF loop isn't fully torn down yet,
-    // or when the user resets and a stale frame sneaks through. A ref gives us a
-    // synchronous lock that doesn't depend on React state update timing.
+    // Guard against re-entrant / duplicate calls.
     if (scanningRef.current) return;
     scanningRef.current = true;
 
     setScanStatus('detecting');
     setError('');
-    try {
-      const res = await experimentsApi.lookupByAruco(markerId);
-      setScannedExp(res.data);
-      setScanStatus('found');
-      // Leave scanningRef = true so no further scans overwrite this result.
-      // It gets cleared explicitly when the user hits the reset (↺) button.
-    } catch (err) {
-      setError(err.response?.status === 404 ? `No experiment for marker ${markerId}.` : 'Scan failed. Try again.');
-      setScanStatus('error');
-      // Allow retry after an error
-      scanningRef.current = false;
+
+    // The session object fetched in Step 1 already contains the experiment
+    // (including full contents). We validate the scanned marker against the
+    // session's expected arucoId instead of doing a global DB lookup — a global
+    // lookup would return whichever experiment owns that marker ID system-wide,
+    // which may be a *different* experiment from a different lab/faculty.
+    const sessionExp = session?.experiment;
+
+    if (!sessionExp) {
+      // Session has no linked experiment — fall back to global lookup
+      try {
+        const res = await experimentsApi.lookupByAruco(markerId);
+        setScannedExp(res.data);
+        setScanStatus('found');
+      } catch (err) {
+        setError(err.response?.status === 404 ? `No experiment for marker ${markerId}.` : 'Scan failed. Try again.');
+        setScanStatus('error');
+        scanningRef.current = false;
+      }
+      return;
     }
-  }, []);
+
+    // Validate the scanned marker matches this session's experiment
+    if (sessionExp.arucoId !== markerId) {
+      setError(
+        `Wrong marker scanned (ID ${markerId}). ` +
+        `This session expects marker ID ${sessionExp.arucoId}. ` +
+        `Please scan the correct card for this experiment.`
+      );
+      setScanStatus('error');
+      scanningRef.current = false;
+      return;
+    }
+
+    // Marker matches — use the experiment already loaded with the session
+    setScannedExp(sessionExp);
+    setScanStatus('found');
+  }, [session]);
 
   const handleContinue = () => {
     navigate('experiment-view', { session, experiment: scannedExp, members });
