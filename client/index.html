@@ -34,6 +34,12 @@
 
   <body>
     <div id="root"></div>
+        <!--
+      js-aruco2 is a legacy UMD library that attaches to window.AR.
+      It must be loaded as a classic (non-module) script BEFORE the React bundle
+      so window.AR is populated when the ArUco scanner initialises.
+    -->
+    <script src="/aruco.js"></script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

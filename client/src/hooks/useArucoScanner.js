@@ -75,17 +75,18 @@ export function useArucoScanner(onDetected) {
   const startScanning = useCallback(async () => {
     setError(null);
 
+    // js-aruco2 is a legacy UMD script loaded via a <script> tag in index.html.
+    // It attaches itself to window.AR.  We no longer use a dynamic import()
+    // because Vite's production bundler rewrites the `this` context inside the
+    // library so the global never lands on window — causing the
+    // "Cannot read properties of undefined (reading 'Image')" error.
     try {
-      // Dynamically import js-aruco
-      // js-aruco2 is a legacy script that attaches itself to the global
-      // object (`this.AR = ...`) instead of using real module.exports.
-      // Under Node/dev this happened to also land on the CJS exports object,
-      // but Vite's production bundler resolves that `this` to `window` —
-      // so the library only ever actually shows up on window.AR.
-      await import('js-aruco2');
       const AR = window.AR;
       if (!AR || !AR.Detector) {
-        throw new Error('AR library did not attach to window as expected');
+        throw new Error(
+          'AR library not found on window.  Make sure /aruco.js is loaded ' +
+          'via a <script> tag in index.html before the React bundle.'
+        );
       }
       detectorRef.current = new AR.Detector();
     } catch (err) {
