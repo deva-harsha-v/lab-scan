@@ -1,0 +1,195 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  HOD
+  ADMIN
+  FACULTY
+  STUDENT
+}
+
+enum ContentType {
+  PDF
+  TEXT
+  YOUTUBE
+  VIRTUAL_LAB
+  STEP
+  SAMPLE_RESULT
+}
+
+enum SessionStatus {
+  DRAFT
+  ACTIVE
+  GRACE
+  CLOSED
+}
+
+model User {
+  id           String       @id @default(cuid())
+  name         String
+  email        String       @unique
+  passwordHash String
+  role         Role         @default(STUDENT)
+  department   String?
+  employeeId   String?      @unique  // required for FACULTY and HOD accounts
+  rollNumber   String?      @unique  // required for STUDENT accounts
+  createdAt    DateTime     @default(now())
+  experiments  Experiment[]
+  sessions     Session[]
+  // HOD-created assignments
+  assignmentsCreated SubjectAssignment[] @relation("HODAssignments")
+  // Faculty assignments
+  assignmentsReceived SubjectAssignment[] @relation("FacultyAssignments")
+  // Student enrollment
+  section      Section?     @relation(fields: [sectionId], references: [id])
+  sectionId    String?
+  // Student lab records
+  labRecords   StudentLabRecord[]
+  refreshTokens RefreshToken[]
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Section {
+  id          String   @id @default(cuid())
+  name        String   // e.g. "EEE-A", "CSE-B"
+  department  String
+  semester    Int
+  academicYear String  // e.g. "2025-26"
+  createdAt   DateTime @default(now())
+  students    User[]
+  assignments SubjectAssignment[]
+}
+
+model Subject {
+  id          String   @id @default(cuid())
+  name        String   // e.g. "Basic Electronics Lab"
+  code        String   @unique // e.g. "EE2301"
+  department  String
+  totalSlots  Int      @default(10) // total experiments in this subject
+  createdAt   DateTime @default(now())
+  assignments SubjectAssignment[]
+}
+
+model SubjectAssignment {
+  id         String   @id @default(cuid())
+  section    Section  @relation(fields: [sectionId], references: [id])
+  sectionId  String
+  subject    Subject  @relation(fields: [subjectId], references: [id])
+  subjectId  String
+  faculty    User     @relation("FacultyAssignments", fields: [facultyId], references: [id])
+  facultyId  String
+  hod        User     @relation("HODAssignments", fields: [hodId], references: [id])
+  hodId      String
+  createdAt  DateTime @default(now())
+  experiments ExperimentSlot[]
+  labRecords  StudentLabRecord[]
+
+  @@unique([sectionId, subjectId])
+}
+
+model ExperimentSlot {
+  id           String   @id @default(cuid())
+  assignment   SubjectAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  assignmentId String
+  slotNumber   Int      // 1, 2, 3 ... totalSlots
+  title        String   // e.g. "Half Wave Rectifier"
+  description  String?
+  maxMarks     Int      @default(10)
+  createdAt    DateTime @default(now())
+  labRecords   StudentLabRecord[]
+
+  @@unique([assignmentId, slotNumber])
+}
+
+model StudentLabRecord {
+  id           String    @id @default(cuid())
+  student      User      @relation(fields: [studentId], references: [id])
+  studentId    String
+  assignment   SubjectAssignment @relation(fields: [assignmentId], references: [id])
+  assignmentId String
+  slot         ExperimentSlot @relation(fields: [slotId], references: [id])
+  slotId       String
+  marks        Int?
+  maxMarks     Int       @default(10)
+  status       String    @default("SUBMITTED") // SUBMITTED, REVIEWED
+  submittedAt  DateTime  @default(now())
+  reviewedAt   DateTime?
+  reviewNote   String?
+
+  @@unique([studentId, slotId])
+}
+
+// ── Legacy models (kept as-is) ─────────────────────────────────────────────
+model Experiment {
+  id          String              @id @default(cuid())
+  title       String
+  description String
+  arucoId     Int                 @unique
+  department  String?
+  createdBy   User                @relation(fields: [createdById], references: [id])
+  createdById String
+  createdAt   DateTime            @default(now())
+  contents    ExperimentContent[]
+  sessions    Session[]
+}
+
+model ExperimentContent {
+  id           String      @id @default(cuid())
+  experiment   Experiment  @relation(fields: [experimentId], references: [id], onDelete: Cascade)
+  experimentId String
+  type         ContentType
+  content      String
+  order        Int
+  label        String?
+}
+
+model Session {
+  id                 String        @id @default(cuid())
+  code               String        @unique
+  experiment         Experiment?   @relation(fields: [experimentId], references: [id])
+  experimentId       String?
+  faculty            User          @relation(fields: [facultyId], references: [id])
+  facultyId          String
+  startsAt           DateTime
+  endsAt             DateTime
+  gracePeriodMinutes Int           @default(10)
+  allowResubmit      Boolean       @default(false)
+  status             SessionStatus @default(DRAFT)
+  createdAt          DateTime      @default(now())
+  submissions        Submission[]
+}
+
+model Submission {
+  id                  String    @id @default(cuid())
+  session             Session   @relation(fields: [sessionId], references: [id])
+  sessionId           String
+  studentName         String
+  rollNumber          String
+  observationPhotoUrl String
+  resultNotes         String?
+  submittedAt         DateTime  @default(now())
+  marks               Int?
+  reviewNote          String?
+  reviewedAt          DateTime?
+  reviewedBy          String?
+
+  @@unique([sessionId, rollNumber], name: "unique_submission_per_session", map: "submission_session_roll_unique")
+}
