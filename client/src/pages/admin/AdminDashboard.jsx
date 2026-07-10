@@ -18,16 +18,16 @@ function RoleBadge({ role, tokens }) {
 function UserRow({ u, onDelete, onEdit, tokens }) {
   const S = makeStyles(tokens);
   return (
-    <div style={{ display:'grid', gridTemplateColumns:'1fr 120px 90px 110px', padding:'12px 16px', borderBottom:`1px solid ${tokens.borderMuted}`, alignItems:'center', minWidth:480 }}>
-      <div>
-        <div style={{ fontSize:14, color:tokens.textPrimary }}>{u.name}</div>
-        <div style={{ fontSize:11, color:tokens.textMuted, fontFamily:"'Space Mono',monospace" }}>{u.email}</div>
-        {u.employeeId && <div style={{ fontSize:11, color:tokens.roleHod, fontFamily:"'Space Mono',monospace", marginTop:2 }}>EMP#{u.employeeId}</div>}
-        {u.rollNumber  && <div style={{ fontSize:11, color:tokens.roleStudent, fontFamily:"'Space Mono',monospace", marginTop:2 }}>#{u.rollNumber}</div>}
+    <div style={{ display:'grid', gridTemplateColumns:'1fr auto auto auto', padding:'clamp(10px, 2vw, 16px)', borderBottom:`1px solid ${tokens.borderMuted}`, alignItems:'center', minWidth:'100%', gap: 8 }}>
+      <div style={{ minWidth: 0 }}>
+        <div style={{ fontSize:'clamp(12px, 2vw, 14px)', color:tokens.textPrimary, fontWeight: 600 }}>{u.name}</div>
+        <div style={{ fontSize:'clamp(10px, 1.5vw, 11px)', color:tokens.textMuted, fontFamily:"'Space Mono',monospace", overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.email}</div>
+        {u.employeeId && <div style={{ fontSize:'clamp(10px, 1.5vw, 11px)', color:tokens.roleHod, fontFamily:"'Space Mono',monospace", marginTop:2 }}>EMP#{u.employeeId}</div>}
+        {u.rollNumber  && <div style={{ fontSize:'clamp(10px, 1.5vw, 11px)', color:tokens.roleStudent, fontFamily:"'Space Mono',monospace", marginTop:2 }}>#{u.rollNumber}</div>}
       </div>
-      <div style={{ fontSize:11, color:tokens.textMuted, fontFamily:"'Space Mono',monospace" }}>{u.department || '—'}</div>
+      <div style={{ fontSize:'clamp(10px, 1.5vw, 11px)', color:tokens.textMuted, fontFamily:"'Space Mono',monospace", whiteSpace: 'nowrap' }}>{u.department || '—'}</div>
       <div><RoleBadge role={u.role} tokens={tokens} /></div>
-      <div style={{ textAlign:'right', display:'flex', gap:6, justifyContent:'flex-end' }}>
+      <div style={{ textAlign:'right', display:'flex', gap:6, justifyContent:'flex-end', flexShrink: 0 }}>
         {(u.role === 'FACULTY' || u.role === 'HOD') && (
           <button onClick={() => onEdit(u)}
             style={{ ...S.btnIcon, color:tokens.accent, borderColor:tokens.accentBorder }}

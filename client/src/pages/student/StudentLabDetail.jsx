@@ -502,7 +502,7 @@ export default function StudentLabDetail() {
 
         {/* Lab header */}
         <div style={{ marginBottom: 24 }}>
-          <h1 style={{ fontFamily: font.mono, fontSize: 20, fontWeight: 700, color: C.text, margin: '0 0 6px' }}>{assignment.subject?.name || 'Unspecified Lab Workstation'}</h1>
+          <h1 style={{ fontFamily: font.mono, fontSize: 'clamp(16px, 4vw, 20px)', fontWeight: 700, color: C.text, margin: '0 0 6px' }}>{assignment.subject?.name || 'Unspecified Lab Workstation'}</h1>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
             <span style={{ fontFamily: font.mono, fontSize: 10, color: C.accent, background: tokens.accentMuted, padding: '3px 8px', borderRadius: 20 }}>{assignment.subject?.code}</span>
             <span style={{ fontFamily: font.mono, fontSize: 10, color: C.muted, background: tokens.bgInput, padding: '3px 8px', borderRadius: 20 }}>Faculty: {assignment.faculty?.name}</span>
@@ -513,7 +513,7 @@ export default function StudentLabDetail() {
         </div>
 
         {/* Stats bar */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12, marginBottom: 28 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))', gap: 12, marginBottom: 28 }}>
           {[
             { label: 'Total Exps', val: slots.length, col: C.text },
             { label: 'Completed', val: done.length, col: C.accent },
@@ -529,10 +529,14 @@ export default function StudentLabDetail() {
 
         {/* Visuals row — mini-chart + completion ring */}
         {slots.length > 0 && (
-          <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', marginBottom: 28, padding: '18px 20px', border: `1px solid ${C.border}`, borderRadius: 14, background: C.surface }}>
-            <CompletionRing slots={slots} />
-            <div style={{ width: 1, background: C.border, alignSelf: 'stretch' }} />
-            <MarksMiniChart slots={slots} />
+          <div style={{ display: 'flex', gap: 'clamp(12px, 3vw, 24px)', flexWrap: 'wrap', marginBottom: 28, padding: 'clamp(12px, 3vw, 20px)', border: `1px solid ${C.border}`, borderRadius: 14, background: C.surface, alignItems: 'flex-start' }}>
+            <div style={{ flex: 1, minWidth: '200px' }}>
+              <CompletionRing slots={slots} />
+            </div>
+            <div style={{ display: 'none', width: 1, background: C.border, alignSelf: 'stretch' }} />
+            <div style={{ flex: 1, minWidth: '200px' }}>
+              <MarksMiniChart slots={slots} />
+            </div>
           </div>
         )}
 

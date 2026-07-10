@@ -87,13 +87,13 @@ export default function StudentDashboard() {
           <span style={{ fontFamily:"'Space Mono',monospace", fontSize:'clamp(8px, 1.5vw, 9px)', color:tokens.accent, background:tokens.accentMuted, border:`1px solid ${tokens.accentBorder}`, padding:'2px 6px', borderRadius:6, fontWeight:700, marginLeft:'clamp(2px, 1vw, 4px)' }}>STUDENT</span>
         </div>
         <div style={{ display:'flex', alignItems:'center', gap:'clamp(8px, 2vw, 12px)', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-          <div style={{ display:'flex', flexDirection:'column', textAlign:'right' }}>
-            <span style={{ fontSize:'clamp(11px, 2vw, 13px)', color:tokens.textPrimary, fontWeight:500 }}>{data?.student?.name || user?.name}</span>
+          <div style={{ display:'flex', flexDirection:'column', textAlign:'right', minWidth: 0 }}>
+            <span style={{ fontSize:'clamp(11px, 2vw, 13px)', color:tokens.textPrimary, fontWeight:500, overflow: 'hidden', textOverflow: 'ellipsis' }}>{data?.student?.name || user?.name}</span>
             <span style={{ fontSize:'clamp(8px, 1.5vw, 10px)', fontFamily:"'Space Mono',monospace", color:tokens.textMuted }}>Active Workspace</span>
           </div>
           <ThemeToggle size="sm" />
-          <button onClick={() => navigate('student-change-password')} style={{ ...S.btnSecondary, padding:'clamp(6px, 1vw, 8px) clamp(10px, 2vw, 14px)', fontSize:'clamp(10px, 1.5vw, 11px)', fontFamily:"'Space Mono',monospace" }}>Change Password</button>
-          <button onClick={() => { logout(); navigate('landing'); }} style={{ ...S.btnSecondary, padding:'clamp(6px, 1vw, 8px) clamp(10px, 2vw, 14px)', fontSize:'clamp(10px, 1.5vw, 11px)', fontFamily:"'Space Mono',monospace", color:tokens.danger, borderColor:tokens.dangerBorder }}>Sign out</button>
+          <button onClick={() => navigate('student-change-password')} style={{ ...S.btnSecondary, padding:'clamp(6px, 1vw, 8px) clamp(10px, 2vw, 14px)', fontSize:'clamp(10px, 1.5vw, 11px)', fontFamily:"'Space Mono',monospace", whiteSpace: 'nowrap', flexShrink: 0 }}>Change Password</button>
+          <button onClick={() => { logout(); navigate('landing'); }} style={{ ...S.btnSecondary, padding:'clamp(6px, 1vw, 8px) clamp(10px, 2vw, 14px)', fontSize:'clamp(10px, 1.5vw, 11px)', fontFamily:"'Space Mono',monospace", color:tokens.danger, borderColor:tokens.dangerBorder, whiteSpace: 'nowrap', flexShrink: 0 }}>Sign out</button>
         </div>
       </nav>
 
@@ -119,7 +119,7 @@ export default function StudentDashboard() {
         </div>
 
         {/* Info cards */}
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(120px, 1fr))', gap:'clamp(10px, 2vw, 14px)' }}>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(100px, 1fr))', gap:'clamp(10px, 2vw, 14px)' }}>
           {[
             { tag:'SECTION',     val: data?.section?.name       || '—' },
             { tag:'DEPARTMENT',  val: data?.section?.department  || '—' },
@@ -134,7 +134,7 @@ export default function StudentDashboard() {
         </div>
 
         {/* Row 1 */}
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(240px, 1fr))', gap:'clamp(12px, 3vw, 20px)' }}>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))', gap:'clamp(12px, 3vw, 20px)' }}>
           {/* Active lab */}
           <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
             <div style={{ fontFamily: "'Space Mono', monospace", fontSize: 11, color: tokens.textMuted, letterSpacing: '0.05em' }}>ACTIVE LABORATORY</div>

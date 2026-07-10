@@ -134,7 +134,7 @@ export default function SubmissionList() {
           </div>
 
           {/* Interactive Hero Section Context */}
-          <div style={{ padding: '32px', borderRadius: '24px', background: isLight ? '#ffffff' : 'linear-gradient(135deg, rgba(10,24,40,0.7), rgba(5,15,25,0.4))', border: `1px solid ${isLight ? '#e5e7eb' : 'rgba(99,210,255,0.12)'}`, marginBottom: '32px', backdropFilter: 'blur(20px)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: isLight ? '0 4px 20px rgba(0,0,0,0.02)' : '0 20px 50px rgba(0,0,0,0.2)' }}>
+          <div style={{ padding: 'clamp(16px, 4vw, 32px)', borderRadius: '24px', background: isLight ? '#ffffff' : 'linear-gradient(135deg, rgba(10,24,40,0.7), rgba(5,15,25,0.4))', border: `1px solid ${isLight ? '#e5e7eb' : 'rgba(99,210,255,0.12)'}`, marginBottom: '32px', backdropFilter: 'blur(20px)', display: 'flex', flexDirection: 'column', gap: '16px', justifyContent: 'space-between', alignItems: 'flex-start', boxShadow: isLight ? '0 4px 20px rgba(0,0,0,0.02)' : '0 20px 50px rgba(0,0,0,0.2)' }}>
             <div>
               <div style={{ fontFamily: font.mono, fontSize: 11, letterSpacing: '0.15em', color: '#63d2ff', textTransform: 'uppercase', marginBottom: 6, fontWeight: 700 }}>Telemetry Ingestion Router</div>
               <h1 style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: '26px', letterSpacing: '-0.02em', color: isLight ? '#1f2937' : '#ffffff', marginBottom: '4px' }}>
@@ -146,7 +146,7 @@ export default function SubmissionList() {
             </div>
             <button
               onClick={() => navigate('session-monitor', { sessionId })}
-              style={{ padding: '10px 20px', border: 'none', borderRadius: 10, background: accentGrad, color: '#ffffff', fontFamily: font.mono, fontWeight: 700, fontSize: 11, letterSpacing: '0.04em', boxShadow: '0 4px 16px rgba(37,99,235,0.2)' }}
+              style={{ padding: '10px 20px', border: 'none', borderRadius: 10, background: accentGrad, color: '#ffffff', fontFamily: font.mono, fontWeight: 700, fontSize: 11, letterSpacing: '0.04em', boxShadow: '0 4px 16px rgba(37,99,235,0.2)', width: '100%', minWidth: '150px' }}
               className="interactive-btn"
             >
               Monitor Activity →
@@ -160,7 +160,7 @@ export default function SubmissionList() {
           )}
 
           {/* Pill-Style Filter Tab Control Engine */}
-          <div style={{ display: 'flex', gap: 6, background: isLight ? '#e5e7eb' : 'rgba(10,20,30,0.6)', padding: 5, borderRadius: 30, marginBottom: 28, border: `1px solid ${isLight ? '#d1d5db' : 'rgba(255,255,255,0.05)'}`, width: 'max-content' }}>
+          <div style={{ display: 'flex', gap: 6, background: isLight ? '#e5e7eb' : 'rgba(10,20,30,0.6)', padding: 5, borderRadius: 30, marginBottom: 28, border: `1px solid ${isLight ? '#d1d5db' : 'rgba(255,255,255,0.05)'}`, width: '100%', overflowX: 'auto', WebkitOverflowScrolling: 'touch', flexWrap: 'wrap' }}>
             <button onClick={() => setFilter('all')} className={`tab-btn ${filter === 'all' ? 'tab-btn-active' : ''}`}>All ({submissions.length})</button>
             <button onClick={() => setFilter('pending')} className={`tab-btn ${filter === 'pending' ? 'tab-btn-active' : ''}`}>Pending ({pendingCount})</button>
             <button onClick={() => setFilter('marked')} className={`tab-btn ${filter === 'marked' ? 'tab-btn-active' : ''}`}>Marked ({markedCount})</button>

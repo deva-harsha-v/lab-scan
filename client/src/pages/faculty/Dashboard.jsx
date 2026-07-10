@@ -549,13 +549,13 @@ export default function FacultyDashboard() {
                               </div>
                             </div>
                           </div>
-                          <div style={{ display:'flex', gap:'6px' }}>
-                            <button className="card-btn" onClick={() => navigate('session-monitor', { sessionId:s.id })} style={cardBtnStyle(tokens.accent)}>Monitor</button>
-                            <button className="card-btn" onClick={() => navigate('submissions', { sessionId:s.id })} style={cardBtnStyle(tokens.textSecondary)}>Review</button>
+                          <div style={{ display:'flex', gap:'6px', flexWrap: 'wrap' }}>
+                            <button className="card-btn" onClick={() => navigate('session-monitor', { sessionId:s.id })} style={{ ...cardBtnStyle(tokens.accent), flex: '1 1 auto', minWidth: '70px' }}>Monitor</button>
+                            <button className="card-btn" onClick={() => navigate('submissions', { sessionId:s.id })} style={{ ...cardBtnStyle(tokens.textSecondary), flex: '1 1 auto', minWidth: '70px' }}>Review</button>
                           </div>
-                          {s.status==='DRAFT' && <button className="card-btn" onClick={() => handleActivate(s.id)} style={{ ...cardBtnStyle(tokens.success), padding:'10px' }}>Activate</button>}
-                          {(s.status==='ACTIVE'||s.status==='GRACE') && <button className="card-btn" onClick={() => handleClose(s.id)} style={{ ...cardBtnStyle(tokens.warning), padding:'10px' }}>Close Session</button>}
-                          {s.status==='DRAFT' && <button className="card-btn" onClick={() => handleDeleteSession(s.id)} style={{ ...cardBtnStyle(tokens.danger), border:`1px dashed ${tokens.dangerBorder}`, padding:'10px' }}>Delete</button>}
+                          {s.status==='DRAFT' && <button className="card-btn" onClick={() => handleActivate(s.id)} style={{ ...cardBtnStyle(tokens.success), padding:'10px', width: '100%' }}>Activate</button>}
+                          {(s.status==='ACTIVE'||s.status==='GRACE') && <button className="card-btn" onClick={() => handleClose(s.id)} style={{ ...cardBtnStyle(tokens.warning), padding:'10px', width: '100%' }}>Close Session</button>}
+                          {s.status==='DRAFT' && <button className="card-btn" onClick={() => handleDeleteSession(s.id)} style={{ ...cardBtnStyle(tokens.danger), border:`1px dashed ${tokens.dangerBorder}`, padding:'10px', width: '100%' }}>Delete</button>}
                         </div>
                       </div>
                     ))}
@@ -587,25 +587,25 @@ export default function FacultyDashboard() {
                 {recentSubmissions.length > 0 ? (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                     {recentSubmissions.map((sub, idx) => (
-                      <div key={sub.id || idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', background: tokens.bgCard, border: `1px solid ${tokens.border}`, borderRadius: 12 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                          <div style={{ background: tokens.accentMuted, color: tokens.accent, fontFamily: "'Space Mono', monospace", fontSize: 11, padding: '6px 12px', borderRadius: 6, border: `1px solid ${tokens.accentBorder}` }}>
+                      <div key={sub.id || idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 'clamp(12px, 3vw, 20px)', background: tokens.bgCard, border: `1px solid ${tokens.border}`, borderRadius: 12, flexWrap: 'wrap', gap: 12 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(8px, 2vw, 16px)', flex: 1, minWidth: '200px' }}>
+                          <div style={{ background: tokens.accentMuted, color: tokens.accent, fontFamily: "'Space Mono', monospace", fontSize: 11, padding: '6px 12px', borderRadius: 6, border: `1px solid ${tokens.accentBorder}`, flexShrink: 0 }}>
                             {sub.sessionCode}
                           </div>
-                          <div>
-                            <div style={{ fontWeight: 600, fontSize: 15, color: tokens.textPrimary }}>
-                              {sub.studentName} <span style={{ color: tokens.textMuted, fontSize: 13, fontWeight: 400 }}>({sub.rollNo || sub.studentRoll})</span>
+                          <div style={{ minWidth: 0 }}>
+                            <div style={{ fontWeight: 600, fontSize: 'clamp(13px, 2vw, 15px)', color: tokens.textPrimary, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              {sub.studentName} <span style={{ color: tokens.textMuted, fontSize: 'clamp(11px, 1.5vw, 13px)', fontWeight: 400 }}>({sub.rollNo || sub.studentRoll})</span>
                             </div>
-                            <div style={{ fontSize: 12, color: tokens.textMuted, marginTop: 4 }}>
-                              {sub.labTitle || 'Unassigned Session Link'} • Received at {new Date(sub.createdAt || sub.time).toLocaleTimeString()}
+                            <div style={{ fontSize: 'clamp(11px, 1.5vw, 12px)', color: tokens.textMuted, marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {sub.labTitle || 'Unassigned Session Link'} • {new Date(sub.createdAt || sub.time).toLocaleTimeString()}
                             </div>
                           </div>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                          <span style={{ color: sub.statusColor || tokens.warning, fontSize: 12, fontWeight: 700, fontFamily: "'Space Mono', monospace" }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(8px, 2vw, 16px)', flexShrink: 0 }}>
+                          <span style={{ color: sub.statusColor || tokens.warning, fontSize: 'clamp(11px, 1.5vw, 12px)', fontWeight: 700, fontFamily: "'Space Mono', monospace", whiteSpace: 'nowrap' }}>
                             {sub.status?.toUpperCase()}
                           </span>
-                          <button onClick={() => navigate('submissions', { sessionId: sub.sessionId })} style={{ background: 'none', border: 'none', color: tokens.accent, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, fontSize: 13 }}>
+                          <button onClick={() => navigate('submissions', { sessionId: sub.sessionId })} style={{ background: 'none', border: 'none', color: tokens.accent, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, fontSize: 'clamp(11px, 1.5vw, 13px)', whiteSpace: 'nowrap', flexShrink: 0 }}>
                             Inspect <ArrowRight size={14} />
                           </button>
                         </div>
@@ -623,16 +623,16 @@ export default function FacultyDashboard() {
             {/* MY LABS SCHEDULER VIEW TAB */}
             {tab === 'my-labs' && (
               <div style={{ animation:'fadeUp 0.4s cubic-bezier(0.16,1,0.3,1) forwards' }}>
-                <div style={{ marginBottom:24, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap:'wrap', gap:12 }}>
-                  <div>
-                    <h1 style={{ fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:24, color:tokens.textPrimary }}>Assigned Lab Registries</h1>
+                <div style={{ marginBottom:24, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap:'wrap', gap:12 }}>
+                  <div style={{ flex: 1, minWidth: '200px' }}>
+                    <h1 style={{ fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:'clamp(18px, 4vw, 24px)', color:tokens.textPrimary }}>Assigned Lab Registries</h1>
                     <p style={{ fontSize:14, color:tokens.textMuted, marginTop:4 }}>Course structural bounds designated to your faculty ID.</p>
                   </div>
-                  <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-                    <div style={{ background: tokens.infoBg, color: tokens.info, border: `1px solid ${tokens.infoBorder}`, padding: '6px 16px', borderRadius: 8, fontFamily: "'Space Mono', monospace", fontSize: 13, fontWeight: 'bold' }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:10, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                    <div style={{ background: tokens.infoBg, color: tokens.info, border: `1px solid ${tokens.infoBorder}`, padding: '6px 16px', borderRadius: 8, fontFamily: "'Space Mono', monospace", fontSize: 13, fontWeight: 'bold', whiteSpace: 'nowrap' }}>
                       {assignedLabsCount} ALLOCATED
                     </div>
-                    <button onClick={() => navigate('faculty-lab-assignments')} style={{ padding:'8px 16px', background:tokens.accentGrad, border:'none', borderRadius:8, color:tokens.textInverse, fontFamily:"'Space Mono',monospace", fontWeight:700, fontSize:11, letterSpacing:'0.05em', cursor:'pointer' }}>
+                    <button onClick={() => navigate('faculty-lab-assignments')} style={{ padding:'8px 16px', background:tokens.accentGrad, border:'none', borderRadius:8, color:tokens.textInverse, fontFamily:"'Space Mono',monospace", fontWeight:700, fontSize:11, letterSpacing:'0.05em', cursor:'pointer', whiteSpace: 'nowrap' }}>
                       MANAGE LABS
                     </button>
                   </div>
